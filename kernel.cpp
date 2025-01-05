@@ -1,5 +1,4 @@
-#include <stdbool.h>
-#include <stddef.h>
+#include <cstddef>
 #include <stdint.h>
 
 /* Check if the compiler thinks you are targeting the wrong operating system. */
