@@ -29,8 +29,7 @@ _start:
 	# Call the global constructors.
 	call _init
 
-	movl $0x100000, %eax
-	push (%eax)
+	pushl %ebx
 
 	# Transfer control to the main kernel.
 	call kernel_main
