@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include <kernel/tty.h>
+#include <kernel/gdt.h>
 
 typedef struct {
 	int flags;
@@ -13,5 +14,7 @@ void kernel_main(multiboot_info_t* mbi) {
 	terminal_initialize();
 
 	char buff[200];
-	printf("%s", itoa(mbi->mem_lower, buff));
+	printf("%s\n", itoa(mbi->mem_lower, buff, 16));
+
+	setupGDT();
 }
