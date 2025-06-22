@@ -50,8 +50,15 @@
                      SEG_LONG(0)     | SEG_SIZE(1) | SEG_GRAN(1) | \
                      SEG_PRIV(3)     | SEG_DATA_RDWR
  
+
+
+uint64_t gdt_struct[5];
+gdt_ptr addr;
+
+extern void gdt_flush(gdt_ptr);
+
 uint64_t create_descriptor(uint32_t base, uint32_t limit, uint16_t flag) {
-    uint32_t descriptor;
+    uint64_t descriptor = 0;
  
     // Create the high 32 bit segment
     descriptor  =  limit       & 0x000F0000;         // set limit bits 19:16
@@ -67,17 +74,23 @@ uint64_t create_descriptor(uint32_t base, uint32_t limit, uint16_t flag) {
     descriptor |= limit  & 0x0000FFFF;               // set limit bits 15:0
  
     char buff[200];
-    printf("0x%s\n", itoa(descriptor, buff, 16));
+    printf("0x%s\n", ltoa(descriptor, buff, 16));
 
     return descriptor;
 }
+
+void setupGDT() {
+    printf("SETTING...\n");
+
+    addr.limit = sizeof(uint64_t) * 5 - 1;
+    addr.base = (uint32_t) gdt_struct;
+
+    gdt_struct[0] = create_descriptor(0, 0, 0);
+    gdt_struct[1] = create_descriptor(0, 0x000FFFFF, (GDT_CODE_PL0));
+    gdt_struct[2] = create_descriptor(0, 0x000FFFFF, (GDT_DATA_PL0));
+    gdt_struct[3] = create_descriptor(0, 0x000FFFFF, (GDT_CODE_PL3));
+    gdt_struct[4] = create_descriptor(0, 0x000FFFFF, (GDT_DATA_PL3));
  
-int setupGDT() {
-    create_descriptor(0, 0, 0);
-    create_descriptor(0, 0x000FFFFF, (GDT_CODE_PL0));
-    create_descriptor(0, 0x000FFFFF, (GDT_DATA_PL0));
-    create_descriptor(0, 0x000FFFFF, (GDT_CODE_PL3));
-    create_descriptor(0, 0x000FFFFF, (GDT_DATA_PL3));
- 
-    return 0;
+
+    // gdt_flush(gdt_struct);
 }
