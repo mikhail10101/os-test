@@ -13,7 +13,8 @@ typedef struct {
 void kernel_main(multiboot_info_t* mbi) {
 	terminal_initialize();
 
-	printf("Terminal\n");
+	// char buf[200];
+	// printf("%s\n", itoa(mbi->mem_lower, buf, 10));
 
 	setupGDT();
 	

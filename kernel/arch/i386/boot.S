@@ -20,22 +20,54 @@ stack_bottom:
 stack_top:
 
 # The kernel entry point.
-.section .text
+.section .multiboot.text
 .global _start
-.type _start, @function
 _start:
-	movl $stack_top, %esp
+	# Setup paging.
+	movl $initial_page_dir - 0xC0000000, %eax
+	movl %eax, %cr3
 
-	# Call the global constructors.
-	call _init
+	movl %cr4, %ecx 
+	orl $0x10, %ecx 
+	movl %ecx, %cr4
 
-	pushl %ebx
+	movl %cr0, %ecx
+	orl $0x80000000, %ecx 
+	movl %ecx, %cr0 
 
-	# Transfer control to the main kernel.
-	call kernel_main
+	jmp higher_half
+# .size _start, . - _start
+
+.section .text
+higher_half:
+	movl $stack_top, %esp	# Set stack pointer
+	XOR %ebp, %ebp			# Set base pointer to 0
+	call _init				# Call global constructors
+	pushl %ebx				# Push multiboot info onto the stack
+	call kernel_main		
 
 	# Hang if kernel_main unexpectedly returns.
 	cli
 1:	hlt
 	jmp 1b
-.size _start, . - _start
+
+# Data section
+.section .data 
+.set PDE_ENTRY, 0b10000011
+.global initial_page_dir
+initial_page_dir:
+	# 768 entries
+	.long PDE_ENTRY
+	.rept 767
+		.long 0
+	.endr
+
+	# 256 entries reserved for kernel
+	.long (0 << 22) | PDE_ENTRY
+	.long (1 << 22) | PDE_ENTRY
+	.long (2 << 22) | PDE_ENTRY
+	.long (3 << 22) | PDE_ENTRY
+	.rept 252
+		.long 0
+	.endr
+
