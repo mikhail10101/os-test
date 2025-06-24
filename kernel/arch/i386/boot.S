@@ -6,7 +6,7 @@
 .set CHECKSUM, -(MAGIC + FLAGS) # checksum of above, to prove we are multiboot
 
 # Declare a header as in the Multiboot Standard.
-.section .multiboot
+.section .multiboot, "ax"
 .align 4
 .long MAGIC
 .long FLAGS
@@ -20,11 +20,12 @@ stack_bottom:
 stack_top:
 
 # The kernel entry point.
-.section .multiboot.text
+.section .multiboot.text, "ax"
 .global _start
 _start:
 	# Setup paging.
-	movl $initial_page_dir - 0xC0000000, %eax
+	movl $initial_page_dir, %eax
+	subl $0xC0000000, %eax
 	movl %eax, %cr3
 
 	movl %cr4, %ecx 
@@ -36,7 +37,7 @@ _start:
 	movl %ecx, %cr0 
 
 	jmp higher_half
-# .size _start, . - _start
+// .size _start, . - _start
 
 .section .text
 higher_half:
@@ -53,6 +54,7 @@ higher_half:
 
 # Data section
 .section .data 
+.align 4096
 .set PDE_ENTRY, 0b10000011
 .global initial_page_dir
 initial_page_dir:
