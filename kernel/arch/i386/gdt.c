@@ -73,15 +73,13 @@ uint64_t create_descriptor(uint32_t base, uint32_t limit, uint16_t flag) {
     descriptor |= base  << 16;                       // set base bits 15:0
     descriptor |= limit  & 0x0000FFFF;               // set limit bits 15:0
  
-    char buff[200];
-    printf("0x%s\n", ltoa(descriptor, buff, 16));
+    // char buff[200];
+    // printf("0x%s\n", ltoa(descriptor, buff, 16));
 
     return descriptor;
 }
 
-void setupGDT() {
-    printf("SETTING...\n");
-
+void gdt_init() {
     addr.limit = sizeof(uint64_t) * 5 - 1;
     addr.base = (uint32_t) gdt_struct;
 

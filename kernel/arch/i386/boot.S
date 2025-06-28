@@ -12,6 +12,16 @@
 .long FLAGS
 .long CHECKSUM
 
+.long 0
+.long 0
+.long 0
+.long 0
+
+.long 0
+.long 800
+.long 600
+.long 32
+
 # Reserve a stack for the initial thread.
 .section .bss
 .align 16

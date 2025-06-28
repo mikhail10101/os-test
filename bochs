@@ -1,0 +1,6 @@
+
+romimage: file=/home/mikha/bochs-2.8/BIOS-bochs-latest
+vgaromimage: file=/home/mikha/bochs-2.8/VGABIOS-lgpl-latest
+ata0-slave: type=cdrom, path=myos.iso, status=inserted
+boot:cdrom
+display_library: x, options = "gui_debug"
