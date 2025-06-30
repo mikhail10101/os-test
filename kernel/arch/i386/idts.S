@@ -1,18 +1,27 @@
+.extern exception_handler
+
 .macro isr_err_stub num
     .global isr_stub_\num
 isr_stub_\num:
+    pusha
+    pushl $\num
     call exception_handler
+    add $4, %esp
+    popa
+    add $4, %esp
     iret
 .endm
 
 .macro isr_no_err_stub num
     .global isr_stub_\num
 isr_stub_\num:
+    pusha
+    pushl $\num
     call exception_handler
+    add $4, %esp
+    popa
     iret
 .endm
-
-.extern exception_handler
 
 isr_no_err_stub 0
 isr_no_err_stub 1
