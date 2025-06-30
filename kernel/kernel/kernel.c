@@ -18,18 +18,18 @@ typedef struct {
 } __attribute__((packed)) multiboot_info_t;
 
 void kernel_main(multiboot_info_t* mbi) {
-	gdt_init();
-	idt_init();
+	gdt_init(); // Initialize the Global Descriptor Table
+	idt_init(); // Initialize the Interrupt Descriptor Table
 	
-	terminal_initialize();
+	terminal_initialize(); // Initialize terminal values
 	printf("Before page memory allocation!\n");
 
-	uint32_t mod1 = *(uint32_t*)(mbi->mods_addr + 4);
-	uint32_t physicalAllocStart = (mod1 + 0xFFF) & ~(0xFFF);
+	uint32_t mod1 = *(uint32_t*)(mbi->mods_addr + 4); // Physical end of the first loaded module
+	uint32_t physicalAllocStart = (mod1 + 0xFFF) & ~(0xFFF); // Rounds mod1 up to the nearest page boundary
 	// char buf[200];
 	// printf("%s\n", itoa(mbi->mem_lower, buf, 10));
 
-	initMem(physicalAllocStart, mbi->mem_upper * 1024);
+	initMem(physicalAllocStart, mbi->mem_upper * 1024); // Initialize memory
 	
 	printf("Working!");
 }

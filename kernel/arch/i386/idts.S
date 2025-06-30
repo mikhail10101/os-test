@@ -1,5 +1,6 @@
 .extern exception_handler
 
+# For interrupts with an error stub
 .macro isr_err_stub num
     .global isr_stub_\num
 isr_stub_\num:
@@ -12,6 +13,7 @@ isr_stub_\num:
     iret
 .endm
 
+# For interrupts without an error stub
 .macro isr_no_err_stub num
     .global isr_stub_\num
 isr_stub_\num:
@@ -22,6 +24,9 @@ isr_stub_\num:
     popa
     iret
 .endm
+
+
+# Table creation
 
 isr_no_err_stub 0
 isr_no_err_stub 1

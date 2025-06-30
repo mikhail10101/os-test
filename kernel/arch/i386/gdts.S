@@ -1,8 +1,9 @@
 .global gdt_flush
 
+
 gdt_flush:
-    movl 4(%esp), %eax
-    lgdt (%eax)           
+    movl 4(%esp), %eax  # gdt_ptr address
+    lgdt (%eax)         # Load global descriptor table
 
     movl $0x10, %eax
     movw %ax, %ds

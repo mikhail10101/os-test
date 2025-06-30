@@ -5,7 +5,7 @@
 
 #include <kernel/gdt.h>
 
-// Reference: https://www.youtube.com/watch?v=jwulDRMQ53I
+// Definitions below are provided by the OSDev Wiki
 
 // Each define here is for a specific flag in the descriptor.
 // Refer to the intel documentation for a description of what each one does.
@@ -52,11 +52,15 @@
  
 
 
-uint64_t gdt_struct[5];
-gdt_ptr addr;
+// A flat descriptor table means all the segments start at 0 and span the entire 4GiB
+// Such a table suggests we are opting in for paging instead of segmentation
+
+uint64_t gdt_struct[5]; // 40 bytes
+gdt_ptr addr;           // 6 bytes
 
 extern void gdt_flush(void*);
 
+// Also provided by the OSDev wiki
 uint64_t create_descriptor(uint32_t base, uint32_t limit, uint16_t flag) {
     uint64_t descriptor = 0;
  
@@ -72,22 +76,22 @@ uint64_t create_descriptor(uint32_t base, uint32_t limit, uint16_t flag) {
     // Create the low 32 bit segment
     descriptor |= base  << 16;                       // set base bits 15:0
     descriptor |= limit  & 0x0000FFFF;               // set limit bits 15:0
- 
-    // char buff[200];
-    // printf("0x%s\n", ltoa(descriptor, buff, 16));
 
     return descriptor;
 }
 
 void gdt_init() {
+    // Initialize the gdt_ptr with the size and base address of the gdt_struct
     addr.limit = sizeof(uint64_t) * 5 - 1;
     addr.base = (uint32_t) gdt_struct;
 
+    // Initialize the gdt_struct
     gdt_struct[0] = create_descriptor(0, 0, 0);
     gdt_struct[1] = create_descriptor(0, 0x000FFFFF, (GDT_CODE_PL0));
     gdt_struct[2] = create_descriptor(0, 0x000FFFFF, (GDT_DATA_PL0));
     gdt_struct[3] = create_descriptor(0, 0x000FFFFF, (GDT_CODE_PL3));
     gdt_struct[4] = create_descriptor(0, 0x000FFFFF, (GDT_DATA_PL3));
  
+    // Flush
     gdt_flush(&addr);
 }
